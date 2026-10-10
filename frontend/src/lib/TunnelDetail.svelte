@@ -645,7 +645,7 @@
   /* ---------- Layout ---------- */
   .detail-panel {
     flex: 1;
-    padding: 52px var(--space-7, 28px) var(--space-7, 28px);
+    padding: max(var(--titlebar-inset), 24px) var(--space-7, 28px) var(--space-7, 28px);
     overflow-y: auto;
     max-width: 760px;
     margin: 0 auto;

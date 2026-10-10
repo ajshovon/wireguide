@@ -120,10 +120,11 @@
      * whose button baselines sit visibly high compared with SF/Segoe UI. */
     --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
                  "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic",
-                 "Cantarell", "Noto Sans", "Noto Sans CJK KR", "Helvetica Neue", Helvetica,
-                 Arial, "Liberation Sans", sans-serif;
+                 "Adwaita Sans", "Cantarell", "Noto Sans", "Noto Sans CJK KR", "Helvetica Neue",
+                 Helvetica, Arial, "Liberation Sans", sans-serif;
     --font-mono: ui-monospace, "SF Mono", Menlo, Monaco, "Cascadia Mono",
-                 Consolas, monospace;
+                 Consolas, "Adwaita Mono", "Source Code Pro", "DejaVu Sans Mono",
+                 monospace;
 
     /* macOS AppKit text style scale */
     --text-large-title: 700 26px/32px var(--font-sans);
@@ -151,6 +152,11 @@
     --row-compact: 24px;
     --row-std:     28px;   /* NSTableView default */
     --row-comfy:   36px;
+
+    /* Space reserved at the top of each pane for the macOS hidden-inset
+     * title bar (traffic lights float over the web content). Platforms
+     * with a real title bar above the webview override this below. */
+    --titlebar-inset: 52px;
 
     /* Corner radius (macOS uses smaller radii than modern web) */
     --radius-xs: 4px;
@@ -344,6 +350,118 @@
 @media (prefers-color-scheme: dark) {
     [data-theme="system"] {
         color-scheme: dark;
+    }
+}
+
+/* ============================================================
+   LINUX — GNOME / Adwaita-aligned surfaces
+   Scoped by the data-platform attribute index.html sets before first
+   paint. Only surfaces, borders, neutral text and shadows change; the
+   brand accent and status colours are shared with the other platforms.
+
+   Why Linux gets its own surfaces:
+     - The window sits under a GTK title bar drawn in neutral grey. The
+       blue-slate canvas above reads as a different app glued beneath it.
+     - Hairlines at #252736 on #1c1d26 are ~1.1:1 — fine on a macOS
+       Retina panel with vibrancy behind them, invisible on the 1x
+       displays common on Linux. Borders here are alpha-on-neutral and
+       hold ~1.3:1 (hairline) / ~1.7:1 (controls) on every surface.
+     - --text-muted is used for real labels (nav group headings, list
+       metadata); it is lifted to AA here instead of staying decorative.
+     - There are no traffic lights to clear, so the title-bar inset
+       collapses to ordinary padding.
+   ============================================================ */
+[data-platform="linux"] {
+    --titlebar-inset: 14px;
+
+    --bg-primary:   #1e1e20;
+    --bg-secondary: #252528;
+    --bg-card:      #2e2e32;
+    --bg-input:     #18181a;
+    --border:        rgba(255, 255, 255, 0.10);
+    --border-strong: rgba(255, 255, 255, 0.20);
+
+    --text-primary:   #f4f4f5;   /* ~15:1 on --bg-primary */
+    --text-secondary: #b6b6bd;   /* ~8.2:1 */
+    --text-muted:     #8a8a93;   /* ~4.8:1 */
+
+    --shadow-xs:  0 0 0 0.5px rgba(255, 255, 255, 0.06),
+                  0 1px 2px  rgba(0, 0, 0, 0.45);
+    --shadow-sm:  0 1px 3px  rgba(0, 0, 0, 0.40),
+                  0 2px 6px  rgba(0, 0, 0, 0.30);
+    --shadow-md:  0 4px 12px rgba(0, 0, 0, 0.50),
+                  0 16px 48px rgba(0, 0, 0, 0.35);
+    --shadow-lg:  0 8px 24px rgba(0, 0, 0, 0.60),
+                  0 24px 64px rgba(0, 0, 0, 0.45);
+
+    --editor-bg:        #18181a;
+    --editor-gutter-bg: #252528;
+    --editor-border:    rgba(255, 255, 255, 0.10);
+    --graph-bg:         #252528;
+    --log-bg:           #1e1e20;
+    --log-border:       rgba(255, 255, 255, 0.08);
+}
+
+/* Must restate every token the dark block above sets: that block shares
+   specificity with [data-theme="light"] and comes later, so on its own it
+   would repaint an explicitly light window dark. */
+[data-platform="linux"][data-theme="light"] {
+    --bg-primary:   #fafafb;
+    --bg-secondary: #f1f1f3;
+    --bg-card:      #ffffff;
+    --bg-input:     #ffffff;
+    --border:        rgba(0, 0, 6, 0.12);
+    --border-strong: rgba(0, 0, 6, 0.24);
+
+    --text-primary:   #1c1c1f;   /* ~16:1 on --bg-primary */
+    --text-secondary: #44444b;   /* ~9.3:1 */
+    --text-muted:     #6e6e77;   /* ~4.8:1 */
+
+    --shadow-xs:  0 0 0 0.5px rgba(0, 0, 6, 0.10),
+                  0 1px 2px rgba(0, 0, 6, 0.06);
+    --shadow-sm:  0 1px 3px rgba(0, 0, 6, 0.10),
+                  0 2px 8px rgba(0, 0, 6, 0.06);
+    --shadow-md:  0 4px 12px rgba(0, 0, 6, 0.12),
+                  0 16px 48px rgba(0, 0, 6, 0.08);
+    --shadow-lg:  0 8px 24px rgba(0, 0, 6, 0.16),
+                  0 24px 64px rgba(0, 0, 6, 0.12);
+
+    --editor-bg:        #ffffff;
+    --editor-gutter-bg: #f1f1f3;
+    --editor-border:    rgba(0, 0, 6, 0.12);
+    --graph-bg:         #f1f1f3;
+    --log-bg:           #ffffff;
+    --log-border:       rgba(0, 0, 6, 0.10);
+}
+
+@media (prefers-color-scheme: light) {
+    [data-platform="linux"][data-theme="system"] {
+        --bg-primary:   #fafafb;
+        --bg-secondary: #f1f1f3;
+        --bg-card:      #ffffff;
+        --bg-input:     #ffffff;
+        --border:        rgba(0, 0, 6, 0.12);
+        --border-strong: rgba(0, 0, 6, 0.24);
+
+        --text-primary:   #1c1c1f;   /* ~16:1 on --bg-primary */
+        --text-secondary: #44444b;   /* ~9.3:1 */
+        --text-muted:     #6e6e77;   /* ~4.8:1 */
+
+        --shadow-xs:  0 0 0 0.5px rgba(0, 0, 6, 0.10),
+                      0 1px 2px rgba(0, 0, 6, 0.06);
+        --shadow-sm:  0 1px 3px rgba(0, 0, 6, 0.10),
+                      0 2px 8px rgba(0, 0, 6, 0.06);
+        --shadow-md:  0 4px 12px rgba(0, 0, 6, 0.12),
+                      0 16px 48px rgba(0, 0, 6, 0.08);
+        --shadow-lg:  0 8px 24px rgba(0, 0, 6, 0.16),
+                      0 24px 64px rgba(0, 0, 6, 0.12);
+
+        --editor-bg:        #ffffff;
+        --editor-gutter-bg: #f1f1f3;
+        --editor-border:    rgba(0, 0, 6, 0.12);
+        --graph-bg:         #f1f1f3;
+        --log-bg:           #ffffff;
+        --log-border:       rgba(0, 0, 6, 0.10);
     }
 }
 

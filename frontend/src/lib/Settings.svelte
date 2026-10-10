@@ -872,6 +872,15 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23FFFFFF' stroke-opacity='.55' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     border-color: rgba(84, 84, 88, 0.72);
   }
+  /* "System" resolving to dark needs the same light chevron — without this
+     the default theme on a dark desktop drew a dark arrow and border on a
+     dark field. */
+  @media (prefers-color-scheme: dark) {
+    :global([data-theme="system"]) select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23FFFFFF' stroke-opacity='.55' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      border-color: rgba(84, 84, 88, 0.72);
+    }
+  }
   select:hover {
     background-color: var(--bg-hover);
   }

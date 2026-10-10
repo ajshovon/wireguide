@@ -969,7 +969,7 @@
     background: color-mix(in srgb, var(--bg-secondary) 93%, var(--text-primary));
     display: flex;
     flex-direction: column;
-    padding-top: 52px;
+    padding-top: var(--titlebar-inset);
     flex-shrink: 0;
   }
 
@@ -1265,14 +1265,14 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding-top: 52px;
+    padding-top: var(--titlebar-inset);
     overflow: hidden;
   }
 
   .logs-view {
     flex: 1;
     min-height: 0;
-    padding-top: 52px;
+    padding-top: var(--titlebar-inset);
     display: flex;
     flex-direction: column;
     overflow: hidden;
