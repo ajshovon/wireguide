@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <!-- WireGuide symbolic icon: the app icon's W glyph on its own. GNOME
+       recolours symbolic icons to the surrounding text colour, so the
+       fill here is only the conventional placeholder. -->
+  <path transform="translate(8 8) scale(0.0245) skewX(-10) translate(-300 -190)"
+        d="M0 0H115L175 235L245 0H355L425 235L485 0H600L480 380H370L300 150L230 380H120Z"
+        fill="#2e3436" stroke="#2e3436" stroke-width="18" stroke-linejoin="round"/>
+</svg>
