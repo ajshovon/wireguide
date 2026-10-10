@@ -152,6 +152,15 @@ sudo dnf install ./WireGuide-linux-amd64.rpm
 The package registers the app menu entry and tray integration; the privileged
 helper is started on demand through PolicyKit (no always-on service).
 
+**GNOME (Fedora Workstation, Ubuntu):** GNOME Shell has no system tray of its
+own. WireGuide works without one — closing the window minimises it instead of
+hiding it, and launching WireGuide again brings the running window back. For
+the tray icon and menu, install the
+[AppIndicator extension](https://extensions.gnome.org/extension/615/appindicator-support/)
+(`sudo dnf install gnome-shell-extension-appindicator` on Fedora). To quit
+completely, right-click the dash icon → **Quit WireGuide**, or run
+`wireguide ctl stop`.
+
 ### Build from Source
 
 ```bash
