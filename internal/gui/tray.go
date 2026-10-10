@@ -660,11 +660,17 @@ func (t *trayManager) rebuildMenu() {
 	m.Add("Quit").OnClick(func(ctx *application.Context) {
 		t.quitApp()
 	})
-	if created || runtime.GOOS == "windows" {
+	if created || runtime.GOOS == "windows" || runtime.GOOS == "linux" {
 		// Windows must go through SetMenu on EVERY rebuild: the tray popup
 		// is a separate PopupMenu that only SetMenu reconstructs, while
 		// Menu.Update() refreshes a window-menu impl the popup never reads —
 		// so refilled items (connection glyphs) stayed invisible forever.
+		//
+		// Linux has the same shape: the tray menu is a D-Bus (dbusmenu)
+		// tree that only SetMenu rebuilds and announces with a
+		// LayoutUpdated signal. Menu.Update() touches a GTK menu the
+		// StatusNotifierItem never exports, so the shell kept showing the
+		// startup layout — every tunnel "○" regardless of state.
 		t.tray.SetMenu(m) // runs m.Update() and caches the NSMenu
 	} else {
 		// macOS: in-place refresh of the same NSMenu — live even while
