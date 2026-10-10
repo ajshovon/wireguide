@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.korjwl1.wireguide</id>
+  <name>WireGuide</name>
+  <summary>WireGuard VPN client with a graphical tunnel manager</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <developer id="io.github.korjwl1">
+    <name>korjwl1</name>
+  </developer>
+  <description>
+    <p>
+      WireGuide is a desktop client for WireGuard. Import or write tunnel
+      configurations, connect with one click, and watch live transfer
+      statistics from the main window or the system tray.
+    </p>
+    <ul>
+      <li>Config editor with validation and autocomplete</li>
+      <li>Kill switch and DNS leak protection</li>
+      <li>Automatic connection rules based on Wi-Fi network</li>
+      <li>Connection history, route inspection and DNS leak test</li>
+      <li>Command-line control with "wireguide ctl"</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">wireguide.desktop</launchable>
+  <icon type="stock">wireguide</icon>
+  <url type="homepage">https://github.com/korjwl1/wireguide</url>
+  <url type="bugtracker">https://github.com/korjwl1/wireguide/issues</url>
+  <url type="vcs-browser">https://github.com/korjwl1/wireguide</url>
+  <categories>
+    <category>Network</category>
+  </categories>
+  <keywords>
+    <keyword>vpn</keyword>
+    <keyword>wireguard</keyword>
+    <keyword>tunnel</keyword>
+  </keywords>
+  <provides>
+    <binary>wireguide</binary>
+  </provides>
+  <content_rating type="oars-1.1"/>
+</component>

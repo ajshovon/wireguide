@@ -19,10 +19,40 @@ release: "1"
 contents:
   - src: "./bin/wireguide"
     dst: "/usr/local/bin/wireguide"
-  - src: "./build/appicon.png"
+  # Full hicolor set (scalable SVG, sized PNGs, symbolic), pre-rendered by
+  # build/icon/render.sh. The previous single entry installed the 1024px
+  # master under 128x128, which icon loaders either rescale badly or skip.
+  # Listed file by file rather than as a tree so the package owns only its
+  # own icons, not the shared hicolor directories.
+  - src: "./build/linux/icons/hicolor/scalable/apps/wireguide.svg"
+    dst: "/usr/share/icons/hicolor/scalable/apps/wireguide.svg"
+  - src: "./build/linux/icons/hicolor/symbolic/apps/wireguide-symbolic.svg"
+    dst: "/usr/share/icons/hicolor/symbolic/apps/wireguide-symbolic.svg"
+  - src: "./build/linux/icons/hicolor/16x16/apps/wireguide.png"
+    dst: "/usr/share/icons/hicolor/16x16/apps/wireguide.png"
+  - src: "./build/linux/icons/hicolor/24x24/apps/wireguide.png"
+    dst: "/usr/share/icons/hicolor/24x24/apps/wireguide.png"
+  - src: "./build/linux/icons/hicolor/32x32/apps/wireguide.png"
+    dst: "/usr/share/icons/hicolor/32x32/apps/wireguide.png"
+  - src: "./build/linux/icons/hicolor/48x48/apps/wireguide.png"
+    dst: "/usr/share/icons/hicolor/48x48/apps/wireguide.png"
+  - src: "./build/linux/icons/hicolor/64x64/apps/wireguide.png"
+    dst: "/usr/share/icons/hicolor/64x64/apps/wireguide.png"
+  - src: "./build/linux/icons/hicolor/128x128/apps/wireguide.png"
     dst: "/usr/share/icons/hicolor/128x128/apps/wireguide.png"
+  - src: "./build/linux/icons/hicolor/256x256/apps/wireguide.png"
+    dst: "/usr/share/icons/hicolor/256x256/apps/wireguide.png"
+  - src: "./build/linux/icons/hicolor/512x512/apps/wireguide.png"
+    dst: "/usr/share/icons/hicolor/512x512/apps/wireguide.png"
   - src: "./build/linux/wireguide.desktop"
     dst: "/usr/share/applications/wireguide.desktop"
+  # AppStream metadata: name, summary and description in GNOME Software /
+  # KDE Discover instead of a bare package name.
+  - src: "./build/linux/io.github.korjwl1.wireguide.metainfo.xml"
+    dst: "/usr/share/metainfo/io.github.korjwl1.wireguide.metainfo.xml"
+  # Branded authentication prompt for the helper (see the file's header).
+  - src: "./build/linux/io.github.korjwl1.wireguide.policy"
+    dst: "/usr/share/polkit-1/actions/io.github.korjwl1.wireguide.policy"
 
 # Wails v3 alpha.74 uses GTK3 and the WebKitGTK 4.1 API on Linux.
 depends:
@@ -55,7 +85,18 @@ overrides:
       - polkit
       - iproute
       - nftables
-  
+    # The top-level recommends use Debian package names, which resolve to
+    # nothing on Fedora/RHEL.
+    recommends:
+      - NetworkManager
+      - google-noto-sans-fonts
+      - google-noto-sans-cjk-fonts
+    # GNOME Shell has no tray of its own; this extension provides one.
+    # WireGuide works without it (closing the window then minimises
+    # instead of hiding), so it is only a suggestion.
+    suggests:
+      - gnome-shell-extension-appindicator
+
   # Arch Linux package names.
   archlinux:
     depends:

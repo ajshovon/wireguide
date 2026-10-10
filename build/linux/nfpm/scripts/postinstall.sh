@@ -18,4 +18,11 @@ else
   echo "Warning: update-mime-database command not found. Custom URL schemes may not be immediately recognized." >&2
 fi
 
+# Refresh the icon theme cache so the launcher icon appears without a
+# re-login. Fedora/RHEL do this through RPM file triggers as well; running
+# it here covers Debian-family and Arch installs.
+if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+  gtk-update-icon-cache -q -t -f /usr/share/icons/hicolor || true
+fi
+
 exit 0

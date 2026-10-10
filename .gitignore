@@ -41,6 +41,10 @@ build/darwin/Assets.car
 .claude/
 .spec-mix/
 
+# Go toolchain state (telemetry counters, upload token) written here when a
+# build runs with its config dir pointed at the repo. Machine-local.
+.config/
+
 # Helper debugging artifacts (stderr captures from `task build DEV=true`
 # launches with WIREGUIDE_HELPER_STDERR=1). Repo-relative, throwaway.
 debug-logs/

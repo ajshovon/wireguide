@@ -1,13 +1,23 @@
 [Desktop Entry]
-Version=1.0
-Name=WireGuide
-Comment=Cross-platform WireGuard VPN desktop client
-# The Exec line includes %u to pass the URL to the application
-Exec=/usr/local/bin/wireguide %u
-Terminal=false
+Version=1.1
 Type=Application
+Name=WireGuide
+GenericName=WireGuard VPN Client
+Comment=Manage and connect WireGuard VPN tunnels
+Exec=wireguide
 Icon=wireguide
+Terminal=false
 Categories=Network;
+Keywords=vpn;wireguard;tunnel;network;privacy;
+StartupNotify=true
+# Matches the GTK program name, which is the Wayland app_id and the X11
+# WM_CLASS instance. Without it GNOME cannot tie the window to this entry
+# and shows a generic icon in the dash and Alt-Tab.
 StartupWMClass=wireguide
+Actions=quit;
 
- 
+# Closing the window keeps WireGuide (and the VPN) running, so the dash's
+# built-in "Quit" only hides it. This is the real one.
+[Desktop Action quit]
+Name=Quit WireGuide
+Exec=wireguide ctl stop

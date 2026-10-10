@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC
+ "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<!--
+  Gives the pkexec prompt for the privileged helper a readable message and
+  the app's icon. Without a matching action pkexec falls back to
+  org.freedesktop.policykit.exec, whose dialog shows the raw command line.
+
+  The authorisation level is deliberately the same as that fallback
+  (administrator authentication, not retained), so this file changes how
+  the prompt looks, not who may start the helper.
+
+  pkexec only applies an action whose exec.path equals the program being
+  run, so this covers the packaged install path. Running from an AppImage
+  or a build directory keeps the generic prompt.
+-->
+<policyconfig>
+  <vendor>WireGuide</vendor>
+  <vendor_url>https://github.com/korjwl1/wireguide</vendor_url>
+  <action id="io.github.korjwl1.wireguide.helper">
+    <description>Start the WireGuide VPN helper</description>
+    <message>Authentication is required to let WireGuide manage VPN tunnels</message>
+    <icon_name>wireguide</icon_name>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin</allow_active>
+    </defaults>
+    <annotate key="org.freedesktop.policykit.exec.path">/usr/local/bin/wireguide</annotate>
+  </action>
+</policyconfig>
