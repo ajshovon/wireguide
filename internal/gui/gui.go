@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"runtime"
 	"sync"
 	"time"
@@ -51,6 +52,20 @@ func init() {
 	application.RegisterEvent[ipc.SettingsChangedPayload]("settings_changed")
 	application.RegisterEvent[struct{}]("config_changed")
 	application.RegisterEvent[struct{}]("tunnels_changed")
+	application.RegisterEvent[string]("theme_applied")
+}
+
+// windowBackground is the colour the native window shows before the web
+// content paints. Dark by default, as before; on Linux it tracks the theme
+// that will actually render, so a light-themed window does not open with a
+// dark flash. Values mirror --bg-primary in frontend/public/style.css.
+func windowBackground(theme string) application.RGBA {
+	if runtime.GOOS == "linux" {
+		if theme == "light" || (theme != "dark" && !desktopPrefersDark()) {
+			return application.NewRGB(250, 250, 251)
+		}
+	}
+	return application.NewRGB(30, 30, 30)
 }
 
 // Run starts the GUI process. Blocks until the Wails app exits.
@@ -70,6 +85,17 @@ func Run(assetsHandler http.Handler, dataDir string) error {
 	// needs the embedded app icon, which init() can't see.
 	buildWindowsTrayIcons()
 
+	// Single instance (Linux; a no-op elsewhere). Launching WireGuide again
+	// — app grid, dash, autostart racing a manual start — must raise the
+	// running window, not start a second GUI that fights the first over the
+	// same helper. This is also the only way back to a window hidden to a
+	// tray the desktop doesn't show. Checked before storage or the helper
+	// are touched; claimSingleInstance explains what a later check costs.
+	if claimSingleInstance(showDock) {
+		slog.Info("WireGuide is already running; asked it to show its window")
+		return nil
+	}
+
 	// 1. Local storage
 	paths, err := storage.GetPaths()
 	if err != nil {
@@ -88,8 +114,14 @@ func Run(assetsHandler http.Handler, dataDir string) error {
 
 	// Apply persisted log level to the GUI side immediately (helper-side
 	// gets it after ensureHelper + the SaveSettings path).
-	if s, err := settingsStore.Load(); err == nil && s != nil && s.LogLevel != "" {
-		setGUILogLevel(s.LogLevel)
+	startupTheme := "system"
+	if s, err := settingsStore.Load(); err == nil && s != nil {
+		if s.LogLevel != "" {
+			setGUILogLevel(s.LogLevel)
+		}
+		if s.Theme != "" {
+			startupTheme = s.Theme
+		}
 	}
 
 	// 2. Helper process (spawn if needed).
@@ -125,7 +157,7 @@ func Run(assetsHandler http.Handler, dataDir string) error {
 	tunnelService := wgapp.NewTunnelService(tunnelStore, settingsStore, historyStore, clients)
 
 	// 4. Wails app
-	app := application.New(application.Options{
+	appOptions := application.Options{
 		Name:        "WireGuide",
 		Description: "Cross-platform WireGuard desktop client",
 		Services: []application.Service{
@@ -137,9 +169,28 @@ func Run(assetsHandler http.Handler, dataDir string) error {
 		Mac: application.MacOptions{
 			ApplicationShouldTerminateAfterLastWindowClosed: false,
 		},
-	})
+	}
+	// Pin the GTK program name: it becomes the Wayland app_id / X11
+	// WM_CLASS that the desktop entry's StartupWMClass matches. The default
+	// is argv[0]'s basename, which differs when run from an AppImage.
+	appOptions.Linux.ProgramName = "wireguide"
+	app := application.New(appOptions)
 	tunnelService.SetApp(app)
 	bindAppToLogHandler(app)
+
+	// Keep GTK in step with the in-app theme (Linux; a no-op elsewhere).
+	// Applied as soon as GTK is up so the first paint is already right —
+	// GtkSettings does not exist before the application starts, so calling
+	// it directly from here would silently do nothing — then again on
+	// every theme the frontend reports applying.
+	app.Event.OnApplicationEvent(events.Linux.ApplicationStartup, func(*application.ApplicationEvent) {
+		applyNativeTheme(startupTheme)
+	})
+	app.Event.On("theme_applied", func(e *application.CustomEvent) {
+		if theme, ok := e.Data.(string); ok {
+			applyNativeTheme(theme)
+		}
+	})
 
 	// Trigger CLLocationManager authorization so this .app bundle appears in
 	// System Settings → Location Services. Must run in the GUI process (not
@@ -180,8 +231,11 @@ func Run(assetsHandler http.Handler, dataDir string) error {
 			Backdrop:                application.MacBackdropTranslucent,
 			TitleBar:                application.MacTitleBarHiddenInset,
 		},
-		BackgroundColour: application.NewRGB(30, 30, 30), // matches --bg-primary dark (#1E1E1E)
-		URL:              "/",
+		BackgroundColour: windowBackground(startupTheme),
+		// The theme rides along so index.html can set data-theme before the
+		// first paint; without it the web content always painted dark until
+		// the frontend had loaded settings, flashing a light-themed window.
+		URL: "/?theme=" + url.QueryEscape(startupTheme),
 	})
 
 	// macOS standard: close button hides the window instead of destroying it.
@@ -204,6 +258,13 @@ func Run(assetsHandler http.Handler, dataDir string) error {
 	}
 	win.RegisterHook(closingEvent, func(event *application.WindowEvent) {
 		event.Cancel()
+		if !trayHostAvailable() {
+			// No tray on this desktop (stock GNOME). Hiding would strand
+			// the window with the VPN still up and nothing on screen to
+			// bring it back, so keep it reachable from the dash/overview.
+			win.Minimise()
+			return
+		}
 		win.Hide()
 		hideDock()
 	})

@@ -2,10 +2,25 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/wails.png" />
+    <link rel="icon" type="image/svg+xml" href="/wireguide.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Tag the platform and a provisional theme before the stylesheet
+         applies so platform- and theme-scoped tokens (style.css) are in
+         effect on the very first paint. The theme is the persisted setting,
+         passed in the window URL by gui.go; App.svelte applies the
+         authoritative value once settings have loaded. -->
+    <script>
+      (function () {
+        var ua = navigator.userAgent;
+        var os = /Mac/.test(ua) ? 'darwin' : /Windows/.test(ua) ? 'windows' : /Linux|X11/.test(ua) ? 'linux' : 'other';
+        var root = document.documentElement;
+        root.setAttribute('data-platform', os);
+        var theme = new URLSearchParams(window.location.search).get('theme');
+        root.setAttribute('data-theme', theme === 'dark' || theme === 'light' ? theme : 'system');
+      })();
+    </script>
     <link rel="stylesheet" href="/style.css" />
-    <title>Wails + Svelte</title>
+    <title>WireGuide</title>
   </head>
   <body>
     <div id="app"></div>

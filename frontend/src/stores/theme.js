@@ -1,4 +1,5 @@
 import { writable, get } from 'svelte/store';
+import { Events } from '@wailsio/runtime';
 
 // User-selected theme preference. One of: 'dark' | 'light' | 'system'.
 // `system` follows the OS via prefers-color-scheme.
@@ -27,6 +28,12 @@ export function applyTheme(name) {
     document.documentElement.setAttribute('data-theme', name);
   }
   resolvedTheme.set(resolve(name));
+  // Tell the native side so window chrome it draws itself (the GTK title
+  // bar on Linux) can match. Best-effort: the UI is already themed, and
+  // the runtime is absent when the frontend runs in a plain browser.
+  try {
+    Promise.resolve(Events.Emit('theme_applied', name)).catch(() => {});
+  } catch (_) {}
 }
 
 // initThemeWatcher hooks into the OS media query so a user sitting on
